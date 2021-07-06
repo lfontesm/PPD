@@ -67,9 +67,9 @@ def quickSort(arr,l,h):
             stack[top] = p + 1
             top = top + 1
             stack[top] = h
-    if nthread == 1:
-        np.set_printoptions(threshold=sys.maxsize)
-        print(arr)
+    # if nthread == 1:
+        # np.set_printoptions(threshold=sys.maxsize)
+    # print(arr)
 
 def selectInterval(nthreads, arrLen):
     nhi=arrLen/nthreads
@@ -87,33 +87,33 @@ def selectInterval(nthreads, arrLen):
     return hiArr
 
 
-arrLenGlobal = 500000
-nthreadsGlobal = 1
-randArrGlobal = np.random.randint(1000000000, 2000000000, arrLenGlobal)
-loHiArrGlobal = selectInterval(nthreadsGlobal, arrLenGlobal)
-# Array com o numero de threads a ser utilizar depois que terminar a iteracao atual
-iterThreadArrGlobal = [ j for j in [1 << i for i in range(8//2 + 1)][::-1] if j <= nthreadsGlobal]
+arrLenGlobal = 50000000
+nthreadsGlobal = 8
 
-start = time.time()
 ############## MULTIPROCESSING ##############
-for nthread in iterThreadArrGlobal:
-    print(f'Thread of number {nthread}')
-    jobs = []
-    loHiArrGlobal = selectInterval(nthread, arrLenGlobal)
-    for threadNum, interval in zip(range(0, nthread), loHiArrGlobal):
-        lo, hi = interval
-        print(f'lo & hi: {lo,hi}')
-        # print(f'Thread {threadNum} will be assigned to array {arr}')
-        thread=multiprocessing.Process(target=quickSort, args=(randArrGlobal, lo, hi))
-        jobs.append(thread)
+for i in range(10):
+    randArrGlobal = np.random.randint(1000000000, 2000000000, arrLenGlobal)
+    loHiArrGlobal = selectInterval(nthreadsGlobal, arrLenGlobal)
+    # Array com o numero de threads a ser utilizar depois que terminar a iteracao atual
+    iterThreadArrGlobal = [ j for j in [1 << i for i in range(nthreadsGlobal//2 + 1)][::-1] if j <= nthreadsGlobal]
+    start = time.time()
+    print(f'Iteracao de numero {i}:')
+    for nthread in iterThreadArrGlobal:
+        print(f'Numero de threads {nthread}')
+        jobs = []
+        loHiArrGlobal = selectInterval(nthread, arrLenGlobal)
+        for threadNum, interval in zip(range(0, nthread), loHiArrGlobal):
+            lo, hi = interval
+            # print(f'Thread {threadNum} will be assigned to array {arr}')
+            thread=multiprocessing.Process(target=quickSort, args=(randArrGlobal, lo, hi))
+            jobs.append(thread)
 
-    for thr in jobs:
-        thr.start()
+        for thr in jobs:
+            thr.start()
 
-    for finishedThr in jobs:
-        finishedThr.join()
+        for finishedThr in jobs:
+            finishedThr.join()
+        print("Time eleapsed in {i}: " + str(time.time()-start))
 #############################################
 
-# print(randArrGlobal)
-
-print("Time eleapsed: " + str(time.time()-start))
+#print(randArrGlobal)

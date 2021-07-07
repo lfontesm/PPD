@@ -88,7 +88,7 @@ def selectInterval(nthreads, arrLen):
 
 
 arrLenGlobal = 50000000
-nthreadsGlobal = 8
+nthreadsGlobal = 4
 
 ############## MULTIPROCESSING ##############
 for i in range(10):

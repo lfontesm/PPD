@@ -1,0 +1,70 @@
+Iteracao de numero 0:
+Numero de threads 4
+Time eleapsed in {i}: 119.73099088668823
+Numero de threads 2
+Time eleapsed in {i}: 366.34094429016113
+Numero de threads 1
+Time eleapsed in {i}: 857.9630239009857
+Iteracao de numero 1:
+Numero de threads 4
+Time eleapsed in {i}: 119.67830657958984
+Numero de threads 2
+Time eleapsed in {i}: 361.1840236186981
+Numero de threads 1
+Time eleapsed in {i}: 844.1487901210785
+Iteracao de numero 2:
+Numero de threads 4
+Time eleapsed in {i}: 122.0698766708374
+Numero de threads 2
+Time eleapsed in {i}: 361.1186137199402
+Numero de threads 1
+Time eleapsed in {i}: 834.4069590568542
+Iteracao de numero 3:
+Numero de threads 4
+Time eleapsed in {i}: 118.52523708343506
+Numero de threads 2
+Time eleapsed in {i}: 363.44534063339233
+Numero de threads 1
+Time eleapsed in {i}: 836.3933491706848
+Iteracao de numero 4:
+Numero de threads 4
+Time eleapsed in {i}: 119.03507685661316
+Numero de threads 2
+Time eleapsed in {i}: 358.9678385257721
+Numero de threads 1
+Time eleapsed in {i}: 863.4392275810242
+Iteracao de numero 5:
+Numero de threads 4
+Time eleapsed in {i}: 126.13461112976074
+Numero de threads 2
+Time eleapsed in {i}: 377.61909794807434
+Numero de threads 1
+Time eleapsed in {i}: 863.2772471904755
+Iteracao de numero 6:
+Numero de threads 4
+Time eleapsed in {i}: 122.35199999809265
+Numero de threads 2
+Time eleapsed in {i}: 367.22244095802307
+Numero de threads 1
+Time eleapsed in {i}: 864.9074883460999
+Iteracao de numero 7:
+Numero de threads 4
+Time eleapsed in {i}: 124.00650978088379
+Numero de threads 2
+Time eleapsed in {i}: 372.10198068618774
+Numero de threads 1
+Time eleapsed in {i}: 871.1302351951599
+Iteracao de numero 8:
+Numero de threads 4
+Time eleapsed in {i}: 127.38494920730591
+Numero de threads 2
+Time eleapsed in {i}: 388.427654504776
+Numero de threads 1
+Time eleapsed in {i}: 868.2285459041595
+Iteracao de numero 9:
+Numero de threads 4
+Time eleapsed in {i}: 121.36722755432129
+Numero de threads 2
+Time eleapsed in {i}: 367.65272855758667
+Numero de threads 1
+Time eleapsed in {i}: 863.9430527687073

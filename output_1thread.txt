@@ -1,0 +1,30 @@
+Iteracao de numero 0:
+Numero de threads 1
+Time eleapsed in {i}: 386.9467878341675
+Iteracao de numero 1:
+Numero de threads 1
+Time eleapsed in {i}: 370.31697964668274
+Iteracao de numero 2:
+Numero de threads 1
+Time eleapsed in {i}: 382.1060416698456
+Iteracao de numero 3:
+Numero de threads 1
+Time eleapsed in {i}: 374.67791056632996
+Iteracao de numero 4:
+Numero de threads 1
+Time eleapsed in {i}: 379.4540276527405
+Iteracao de numero 5:
+Numero de threads 1
+Time eleapsed in {i}: 386.53633737564087
+Iteracao de numero 6:
+Numero de threads 1
+Time eleapsed in {i}: 382.3039336204529
+Iteracao de numero 7:
+Numero de threads 1
+Time eleapsed in {i}: 378.90348839759827
+Iteracao de numero 8:
+Numero de threads 1
+Time eleapsed in {i}: 377.23474645614624
+Iteracao de numero 9:
+Numero de threads 1
+Time eleapsed in {i}: 387.70263504981995

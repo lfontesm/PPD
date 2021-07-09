@@ -35,3 +35,11 @@
 Os resultados estão coerentes com o que esperávamos. O algoritmo utilizado foi o _QuickSort_, o qual não é muito escalável para _multithreading/multiprocessing_. Dito isso, o resultado esperado para a atividade sugerida é que depois que cada processo finaliza a ordenação de uma parte do vetor de tamanho **n**, ele deve passar um vetor maior para o próximo processo, composto por dois vetores ordenados. Obviamente, isso é semi-equivalente a reordenação inteira de um vetor de tamanho **n*2** , resultando em uma acumulação do tempo de execução.
 
 Note que caso a performance da atividade fosse prioridade, poderíamos ter utilizado um algoritmo mais amigável com paralelismo, como por exemplo, _MergeSort_.
+
+---
+
+Observação: Foi testado um algoritmo de busca de um número em um vetor. E o resultado observado, foi constante, que é exatamente o esperado, dado o algoritmo utilizado (iteração em um vetor possui notação assintótica de O(n)).
+
+![image](https://user-images.githubusercontent.com/28660375/125143079-d5943e80-e0ef-11eb-97c3-c7c478a4dca6.png)
+
+A _screenshot_ acima exibe a diferença entre o resultado obtido pela utilização de _multiprocessing_ (k = 8) e apenas um único processo (k = 1). Por não ser o objetivo do trabalho, não vamos dar uma explicação mais detalhada ou fornecer uma análise mais profunda dos resultados obtidos, porém, é notável que enquanto o tempo de procura utilizando o método de _multiprocessing_ costumava ser constante e possui média de 1.5 segundos (para n = 50 milhões), o tempo de execução com um único processo variava e conseguia chegar até em 8 segundos.

@@ -1,9 +1,7 @@
-#!/home/uncanny/miniconda3/envs/PPD/bin/python
+#!/usr/bin/python
 
 import numpy as np
-import threading
 import multiprocessing
-import sys
 import time
 
 
@@ -67,9 +65,7 @@ def quickSort(arr,l,h):
             stack[top] = p + 1
             top = top + 1
             stack[top] = h
-    # if nthread == 1:
-        # np.set_printoptions(threshold=sys.maxsize)
-    # print(arr)
+            
 
 def selectInterval(nthreads, arrLen):
     nhi=arrLen/nthreads
@@ -115,5 +111,3 @@ for i in range(10):
             finishedThr.join()
         print("Time eleapsed in {i}: " + str(time.time()-start))
 #############################################
-
-#print(randArrGlobal)

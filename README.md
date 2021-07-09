@@ -1,5 +1,10 @@
 # Relatório do primeiro trabalho de PPD
 
+## Colaboradores
+@elcineyjr (Elciney Júnior)
+@lfmoreira (Leonardo Fontes)
+@luanripax (Luan Thome)
+
 ## Instruções para execução do programa
 * Versão do python: `v3.9.5`
 * Bibliotecas utilizadas: `numpy multiprocessing time`

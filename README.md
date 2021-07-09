@@ -1,9 +1,9 @@
 # Relatório do primeiro trabalho de PPD
 
 ## Colaboradores
-@elcineyjr (Elciney Júnior)
-@lfmoreira (Leonardo Fontes)
-@luanripax (Luan Thome)
+[@elcineyjr](https://github.com/elcineyjr) (Elciney Júnior)  
+[@lfontesm](https://github.com/lfontesm)   (Leonardo Fontes)  
+[@luanripax](https://github.com/luanripax) (Luan Thome)   
 
 ## Instruções para execução do programa
 * Versão do python: `v3.9.5`

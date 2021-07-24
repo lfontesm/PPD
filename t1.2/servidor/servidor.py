@@ -1,73 +1,18 @@
-#!/home/uncanny/miniconda3/envs/PPD/bin/python
+#!/usr/bin/python
 
 from xmlrpc.server import *
 
-# class HashTable(object):
-#     def __init__(self, length=4):
-#         # Initiate our array with empty values.
-#         self.array = [None] * length
-    
-#     def hash(self, key):
-#         """Get the index of our array for a specific string key"""
-#         length = len(self.array)
-#         return hash(key) % length
-        
-#     def add(self, key, value):
-#         """Add a value to our array by its key"""
-#         index = self.hash(key)
-#         if self.array[index] is not None:
-#             # This index already contain some values.
-#             # This means that this add MIGHT be an update
-#             # to a key that already exist. Instead of just storing
-#             # the value we have to first look if the key exist.
-#             for kvp in self.array[index]:
-#                 # If key is found, then update
-#                 # its current value to the new value.
-#                 if kvp[0] == key:
-#                     kvp[1] = value
-#                     break
-#             else:
-#                 # If no breaks was hit in the for loop, it 
-#                 # means that no existing key was found, 
-#                 # so we can simply just add it to the end.
-#                 self.array[index].append([key, value])
-#         else:
-#             # This index is empty. We should initiate 
-#             # a list and append our key-value-pair to it.
-#             self.array[index] = []
-#             self.array[index].append([key, value])
-    
-#     def get(self, key):
-#         """Get a value by key"""
-#         index = self.hash(key)
-#         if self.array[index] is None:
-#             raise KeyError()
-#         else:
-#             # Loop through all key-value-pairs
-#             # and find if our key exist. If it does 
-#             # then return its value.
-#             for kvp in self.array[index]:
-#                 if kvp[0] == key:
-#                     return kvp[1]
-            
-#             # If no return was done during loop,
-#             # it means key didn't exist.
-#             raise KeyError()
+hashTable = {}
 
-hexu_teibru = {}
+def put(value):
+    valueStr = str(value)
+    hashTable[valueStr] = value
 
-def put(number):
-    numberStr = str(number)
-    hexu_teibru[numberStr] = number
+def get(key):
+    keyStr = str(key)
+    return hashTable.get(keyStr)
 
-def get(number):
-    numberStr = str(number)
-    return hexu_teibru.get(numberStr)
-
-def oi_meu_bom():
-     return 'oi meu bom'
-
-server_ = SimpleXMLRPCServer(('localhost', 8000))
+server_ = SimpleXMLRPCServer(('localhost', 8000), allow_none=True)
 server_.register_function(put, 'put')
 server_.register_function(get, 'get')
 

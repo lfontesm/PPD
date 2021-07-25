@@ -6,13 +6,16 @@ import multiprocessing
 import time
 import sys
 
+# Conexao com o servidor
 connection_ = xmlrpc.client.ServerProxy('http://localhost:8000')
 
+# Quantidade de numeros aleatorios para inserir
 MAX_LEN = 100000
 
 # Mudar o numero de threads a ser usada
-K = 2
+K = 4
 
+# Objeto gerador de numeros aleatorios com seed de 12345
 rng = np.random.default_rng(12345)
 
 def insert_numbers(len, connection):
@@ -29,7 +32,6 @@ def retrieve_numbers(len, connection):
 def interact_with_server(connection, threadNum):
     qtdRandNums = MAX_LEN//threadNum
 
-    print(qtdRandNums, file=sys.stderr)
     insert_numbers(qtdRandNums, connection)
     retrieve_numbers(qtdRandNums, connection)
 
@@ -47,6 +49,6 @@ for thr in jobs:
 for finishedThr in jobs:
     finishedThr.join()
 
-print("Time eleapsed: " + str(time.time()-start))
+print("Time elapsed: " + str(time.time()-start))
 
 #############################################

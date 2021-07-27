@@ -1,8 +1,13 @@
 # Trabalho 1.2 de PPD
 
-Biblioteca externa utilizada: Numpy
+## Colaboradores
+[@elcineyjr](https://github.com/elcineyjr) (Elciney Júnior)  
+[@lfontesm](https://github.com/lfontesm)   (Leonardo Fontes)  
+[@luanripax](https://github.com/luanripax) (Luan Thome)
 
-Versão do python: Python 3.8.10
+## Dependencias
+* Biblioteca externa utilizada: Numpy
+* Versão do python: Python 3.8.10
 
 ### Como rodar?
 * Para mudar o número de threads executadas no programa, mudar a variável K;

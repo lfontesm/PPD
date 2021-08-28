@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3.9.5-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    container_name: rabbitmq
+    networks:
+      - redebraba
+  listener:
+    build: .
+    entrypoint: dockerize -wait tcp://rabbitmq:5672 python3 recv.py
+    container_name: ppd
+    depends_on:
+        - "rabbitmq"
+    ports:
+      - "5672"
+    volumes:
+      - .:/app
+    networks:
+      - redebraba
+networks:
+  redebraba: 

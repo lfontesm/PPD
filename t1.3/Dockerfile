@@ -4,7 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN rm messages.log
 RUN pip install pika
 
 RUN apk add --no-cache openssl

@@ -11,8 +11,8 @@ function log_in_container(){
 }
 
 function start_up_containers() {
-	docker-compose up >/dev/null &
-	echo Waiting for rabbitmq host...
+	docker-compose up --build >/dev/null &
+	echo Waiting for rabbitmq host. This can take a few seconds...
 	if [[ $? -eq 0 ]]; then
 		while true; do
 			nc -z localhost 5672

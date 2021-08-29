@@ -27,7 +27,11 @@ function start_up_containers() {
 # Check if cmd was executed as root
 if [[ $EUID -ne 0 ]]; then
 	echo pls exec as rooteh mah frend
-	#exit
+	exit
+fi
+
+if ! ncat="$(type -p nc)" || [[ -z $ncat ]]; then
+	echo install netcat plz
 fi
 
 # Start up the containers
@@ -39,7 +43,3 @@ else
 	fi
 	start_up_containers
 fi
-
-#docker-compose up --build
-
-

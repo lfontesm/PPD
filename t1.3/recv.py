@@ -8,9 +8,12 @@ import time
 MAX_NUM=2**32
 
 def boot():
-	time.sleep(5)
 	# gera num do id
 	nodeid=random.randint(0, MAX_NUM)
+
+	# msg q ele vai enviar pro broker
+	# no caso eu to tentando fazer o processo dele publicar o id do seu noh para o broker
+	message=f"Nodeid: {nodeid}"
 
 	# conecta no rabbitmq
 	connection = pika.BlockingConnection(
@@ -24,13 +27,12 @@ def boot():
 
 	channel.queue_bind(exchange='logs', queue=queue_name)
 
-	# msg q ele vai enviar pro broker
-	# no caso eu to tentando fazer o processo dele publicar o id do seu noh para o broker
-	message=f"Nodeid: {nodeid}"
+	time.sleep(2.5)
 
 	# publica msg em todas as filas (routing_key='')
 	channel.basic_publish(exchange='logs', routing_key='', body=message)
-
+	
+	time.sleep(2.5)
 	#print(f'[*] {queue_name} is waiting for logs. To exit press CTRL+C')
 
 	channel.basic_consume(
@@ -40,6 +42,8 @@ def boot():
 
 	# pega msg da fila
 	#mf, hf, body = channel.basic_get(queue=queue_name, auto_ack=True)
+	#if mf:
+	#	print(body)
 
 	# fecha conexao
 	connection.close()

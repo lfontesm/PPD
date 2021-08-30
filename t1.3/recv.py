@@ -8,15 +8,14 @@ import time
 MAX_NUM=2**32
 
 def boot():
-	########## PROCEDIMENTO PARA QUE TODOS OS NOS ENVIEM SEUS RESPECTIVOS NODEID PARA O BROKER ##########
-	# gera num do id
+	########## GENERATES NODEID AND SENDS IT TO BROKER ##########
+	# gerenates a random id
 	nodeid=random.randint(0, MAX_NUM)
 
-	# msg q ele vai enviar pro broker
-	# no caso eu to tentando fazer o processo dele publicar o id do seu noh para o broker
+	# message that will be sent to broker
 	message=f"{nodeid}"
 
-	# conecta no rabbitmq
+	# connects to rabbitmq
 	connection = pika.BlockingConnection(
     	pika.ConnectionParameters(host='rabbitmq'))
 	channel = connection.channel()
@@ -30,13 +29,14 @@ def boot():
 
 	time.sleep(2.5)
 
-	# publica msg em todas as filas (routing_key='')
+	# publishes the message to all queues (routing_key='')
 	channel.basic_publish(exchange='logs', routing_key='', body=message)
 	
 	time.sleep(2.5)
-	########## FIM. ABAIXO DESTA LINHA DEVE ESTAR O PROCEDIMENTO PARA OS NOS RECUPERAREM OS NODEID DA FILA DE MESSAGERIA #########
 
-	# Pega mensagens da fila ate esvaziar
+	########## DONE. BELOW THIS IS WHERE WE RETRIEVE THE NODEIDS FROM THE MESSAGE QUEUE #########
+
+	# Get all messages until the queue is empty
 	nodeidlist=[]
 	while True:
 		mf,pr,body=channel.basic_get(queue=queue_name, auto_ack=True)
@@ -48,11 +48,11 @@ def boot():
 	# Debug
 #	print('am here!')
 
-	# fecha conexao
+	# closes the connection
 	connection.close()
 	return nodeid, nodeidlist
 
-# Funcao que faz o calculo para saber quais nos sao vizinhos do no atual.
+# decides which nodes are the neighbors from the current one
 def calculate_neighbors():
 	nodeid, nodeidlist=boot()
 	

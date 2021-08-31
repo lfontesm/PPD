@@ -66,10 +66,8 @@ def calculate_neighbors():
 	# Remove it's own nodeid from list
 	int_nodeidlist.remove(nodeid)
 
-	# Check if the current nodeid is either the highest or lowest value
-	if is_outermost_val(nodeid, int_nodeidlist, select_by='highest'):
-		predecessor, successor = max(int_nodeidlist), min(int_nodeidlist)
-	elif is_outermost_val(nodeid, int_nodeidlist, select_by='lowest'):
+	# Check if the current nodeid is either the highest or lowest valu
+	if is_outermost_val(nodeid, int_nodeidlist):
 		predecessor, successor = max(int_nodeidlist), min(int_nodeidlist)
 	else:
 		lowerbound_index, upperbound_index = boundaries(int_nodeidlist, nodeid)
@@ -78,15 +76,17 @@ def calculate_neighbors():
 
 	print(f"I'm {nodeid} and my predecessor is {predecessor} and my successor is {successor}")
 
-def is_outermost_val(num, list_, select_by='highest'):
-	if select_by=='highest':
-		if num > max(list_):
-			return True
-		return False
-	elif select_by=='lowest':
-		if num < min(list_):
-			return True
-		return False
+def is_outermost_val(num, list_):
+	return num > max(list_) or num < min(list_)
+
+	# if select_by=='highest':
+	# 	if num > max(list_):
+	# 		return True
+	# 	return False
+	# elif select_by=='lowest':
+	# 	if num < min(list_):
+	# 		return True
+	# 	return False
 
 def contains_duplicates(list_):
 	for elem in list_:

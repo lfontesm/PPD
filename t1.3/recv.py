@@ -8,7 +8,7 @@ import time
 MAX_NUM=2**10
 PROCESS_NUM=4
 
-def boot():
+def join():
 	########## GENERATES NODEID AND SENDS IT TO BROKER ##########
 	# gerenates a random id
 	nodeid=random.randint(0, MAX_NUM)
@@ -54,8 +54,8 @@ def boot():
 	return nodeid, nodeidlist
 
 # decides which nodes are the neighbors from the current one
-def calculate_neighbors():
-	nodeid, nodeidlist=boot()
+def boot():
+	nodeid, nodeidlist=join()
 	
 	# Convert the elements in the list to int
 	int_nodeidlist=list( map(lambda x: int(x), nodeidlist) )
@@ -123,7 +123,7 @@ random.seed()
 
 jobs=[]
 for i in range(PROCESS_NUM):
-	p=Process(target=calculate_neighbors)
+	p=Process(target=boot)
 	jobs.append(p)
 for job in jobs:
 	job.start()

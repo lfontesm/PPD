@@ -5,11 +5,7 @@ from multiprocessing import Process
 import random
 import time
 
-<<<<<<< HEAD
 MAX_NUM=2**10
-=======
-MAX_NUM=2**6
->>>>>>> 40cc742194b75596d32a3275afdc66f90b3a0abe
 
 def boot():
 	########## GENERATES NODEID AND SENDS IT TO BROKER ##########
@@ -38,7 +34,7 @@ def boot():
 	
 	time.sleep(2.5)
 
-	########## DONE. BELOW THIS IS WHERE WE RETRIEVE THE NODEIDS FROM THE MESSAGE QUEUE #########
+	########## DONE. BELOW IS THE ROUTINE WHERE WE RETRIEVE THE NODEIDS FROM THE MESSAGE QUEUE #########
 
 	# Get all messages until the queue is empty
 	nodeidlist=[]
@@ -70,27 +66,27 @@ def calculate_neighbors():
 	# Remove it's own nodeid from list
 	int_nodeidlist.remove(nodeid)
 
-	print(f"{nodeid} -> {int_nodeidlist}")
+	# Check if the current nodeid is either the highest or lowest value
+	if is_outermost_val(nodeid, int_nodeidlist, select_by='highest'):
+		predecessor, successor = max(int_nodeidlist), min(int_nodeidlist)
+	elif is_outermost_val(nodeid, int_nodeidlist, select_by='lowest'):
+		predecessor, successor = max(int_nodeidlist), min(int_nodeidlist)
+	else:
+		lowerbound_index, upperbound_index = boundaries(int_nodeidlist, nodeid)
+		predecessor=int_nodeidlist[lowerbound_index]
+		successor=int_nodeidlist[upperbound_index]
 
-	lowerbound_index, upperbound_index = boundaries(int_nodeidlist, nodeid)
+	print(f"I'm {nodeid} and my predecessor is {predecessor} and my successor is {successor}")
 
-	print(f"Index of lowerbound for {nodeid}:", lowerbound_index)
-	print(f"Index of upperbound for {nodeid}:", upperbound_index)
-
-	predecessor=int_nodeidlist[lowerbound_index]
-	successor=int_nodeidlist[upperbound_index]
-
-	print(f"My predecessor is {predecessor} and my successor is {successor}")
-
-def highest_between(num, list_):
-	if num > max(list_):
-		return True
-	return False
-
-def lowest_between(num, list_):
-	if num < min(list_):
-		return True
-	return False
+def is_outermost_val(num, list_, select_by='highest'):
+	if select_by=='highest':
+		if num > max(list_):
+			return True
+		return False
+	elif select_by=='lowest':
+		if num < min(list_):
+			return True
+		return False
 
 def contains_duplicates(list_):
 	for elem in list_:
@@ -105,19 +101,6 @@ def get_first_val(list_, positive=True):
 			elif not positive and i<0:
 				return i
 
-# lhel se conseguir fazer essas duas funçoes abaixo serem mais bonitas ia ser lesgal
-def isAllNegative(list_):
-	for item in list_:
-		if item > 0:
-			return False
-	return True
-
-def isAllPositive(list_):
-	for item in list_:
-		if item < 0:
-			return False
-	return True
-
 # Returns the predecessor's and successor's index for the current node neighbors list 
 def boundaries(list_, nodeid):
 	# Subtract nodeid from the nodeid list to get the decimal distance from the current node
@@ -126,18 +109,8 @@ def boundaries(list_, nodeid):
 
 	sorted_distance_list=sorted(distance_list, key=abs)
 
-	# means that the current node is the biggest one
-	if isAllNegative(sorted_distance_list):
-		lowerbound=sorted_distance_list[0] 
-		upperbound=sorted_distance_list[-1]
-	# means the current node is the first one
-	elif isAllPositive(sorted_distance_list):
-		lowerbound=sorted_distance_list[-1]	
-		upperbound=sorted_distance_list[0]
-	# the current node is in the middle
-	else:
-		lowerbound=get_first_val(sorted_distance_list, positive=False)
-		upperbound=get_first_val(sorted_distance_list)
+	lowerbound=get_first_val(sorted_distance_list, positive=False)
+	upperbound=get_first_val(sorted_distance_list)
 
 	return distance_list.index(lowerbound), distance_list.index(upperbound)
 

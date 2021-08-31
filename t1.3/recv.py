@@ -7,14 +7,17 @@ import time
 
 MAX_NUM=2**10
 PROCESS_NUM=4
+HASH_TABLE={}
+NODEID=-1
 
 def join():
 	########## GENERATES NODEID AND SENDS IT TO BROKER ##########
 	# gerenates a random id
-	nodeid=random.randint(0, MAX_NUM)
+	global NODEID
+	NODEID=random.randint(0, MAX_NUM)
 
 	# message that will be sent to broker
-	message=f"{nodeid}"
+	message=f"{NODEID}"
 
 	# connects to rabbitmq
 	connection = pika.BlockingConnection(
@@ -49,14 +52,12 @@ def join():
 	# Debug
 #	print('am here!')
 
-	# closes the connection
-	connection.close()
-	return nodeid, nodeidlist
+	return NODEID, nodeidlist, (connection, result, channel)
 
 # decides which nodes are the neighbors from the current one
 def boot():
-	nodeid, nodeidlist=join()
-	
+	nodeid, nodeidlist, connectioninfo=join()
+
 	# Convert the elements in the list to int
 	int_nodeidlist=list( map(lambda x: int(x), nodeidlist) )
 
@@ -77,17 +78,29 @@ def boot():
 
 	print(f"I'm {nodeid} and my predecessor is {predecessor} and my successor is {successor}")
 
+	start_storing(nodeid, predecessor, connectioninfo)
+
+def start_storing(nodeid, predecessor, connectioninfo):
+	connection, result, channel=connectioninfo
+	queue_name=result.method.queue
+
+	channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+	
+	print("ESTOU PRONTO CAPITAO")
+	channel.start_consuming()
+	# k, v
+
+	# closes the connection
+	connection.close()
+
+def callback(ch, method, properties, body):
+	with open("messages.log", "a") as f:
+		body=body.decode('utf-8').split(",")
+		f.write(f"key:{body[0]}, val:{body[1]}--SIGNED BY: {NODEID}\n\n")
+
+
 def is_outermost_val(num, list_):
 	return num > max(list_) or num < min(list_)
-
-	# if select_by=='highest':
-	# 	if num > max(list_):
-	# 		return True
-	# 	return False
-	# elif select_by=='lowest':
-	# 	if num < min(list_):
-	# 		return True
-	# 	return False
 
 def contains_duplicates(list_):
 	for elem in list_:
@@ -114,10 +127,6 @@ def boundaries(list_, nodeid):
 	upperbound=get_first_val(sorted_distance_list)
 
 	return distance_list.index(lowerbound), distance_list.index(upperbound)
-
-
-def callback(ch, method, properties, body):
-	print(f"I  recieved", body)
 
 random.seed()
 

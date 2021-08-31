@@ -11,7 +11,7 @@ services:
       - redebraba
   listener:
     build: .
-    entrypoint: dockerize -wait tcp://rabbitmq:5672 python3 loop.py
+    entrypoint: dockerize -wait tcp://rabbitmq:5672 python3 recv.py > /dev/stdout
     container_name: ppd
     depends_on:
         - "rabbitmq"

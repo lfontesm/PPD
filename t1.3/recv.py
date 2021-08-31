@@ -6,9 +6,12 @@ import random
 import time
 
 MAX_NUM=2**10
-PROCESS_NUM=4
+PROCESS_NUM=8
 HASH_TABLE={}
 NODEID=-1
+NODEID_LIST=[]
+PREDECESSOR=-1
+SUCCESSOR=-1
 
 def join():
 	########## GENERATES NODEID AND SENDS IT TO BROKER ##########
@@ -31,12 +34,12 @@ def join():
 
 	channel.queue_bind(exchange='logs', queue=queue_name)
 
-	time.sleep(2.5)
+	time.sleep(1)
 
 	# publishes the message to all queues (routing_key='')
 	channel.basic_publish(exchange='logs', routing_key='', body=message)
 	
-	time.sleep(2.5)
+	time.sleep(1)
 
 	########## DONE. BELOW IS THE ROUTINE WHERE WE RETRIEVE THE NODEIDS FROM THE MESSAGE QUEUE #########
 
@@ -48,9 +51,6 @@ def join():
 			nodeidlist.append(body)
 		else:
 			break
-
-	# Debug
-#	print('am here!')
 
 	return NODEID, nodeidlist, (connection, result, channel)
 
@@ -76,27 +76,54 @@ def boot():
 		predecessor=int_nodeidlist[lowerbound_index]
 		successor=int_nodeidlist[upperbound_index]
 
-	print(f"I'm {nodeid} and my predecessor is {predecessor} and my successor is {successor}")
+	global NODEID_LIST
+	NODEID_LIST=int_nodeidlist
 
-	start_storing(nodeid, predecessor, connectioninfo)
+	global PREDECESSOR
+	PREDECESSOR=predecessor
 
-def start_storing(nodeid, predecessor, connectioninfo):
+	global SUCCESSOR
+	SUCCESSOR=successor
+
+	start_storing(connectioninfo)
+
+def start_storing(connectioninfo):
 	connection, result, channel=connectioninfo
 	queue_name=result.method.queue
 
 	channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 	
-	print("ESTOU PRONTO CAPITAO")
+	print(f"Node {NODEID} is ready.")
 	channel.start_consuming()
-	# k, v
 
 	# closes the connection
 	connection.close()
 
 def callback(ch, method, properties, body):
-	with open("messages.log", "a") as f:
-		body=body.decode('utf-8').split(",")
-		f.write(f"key:{body[0]}, val:{body[1]}--SIGNED BY: {NODEID}\n\n")
+	body=body.decode('utf-8').split(",")
+	if len(body) == 2:
+		key=int(body[0])
+		val=body[1]
+	else: 
+		key=int(body[0])
+		val=None
+
+	# Special case in the node is the first from the list
+	if NODEID < min(NODEID_LIST) and (key >= PREDECESSOR and key < MAX_NUM or key >= 0 and key < NODEID):
+		log(key,val)
+	elif key >= PREDECESSOR and key < NODEID:
+		log(key,val)
+
+
+def log(key, val):
+	# Get
+	if val == None:
+		print(f"hashu taburu at {key}: {HASH_TABLE[key]} -- SIGNED BY: {NODEID}")
+	else: # Put
+		with open("messages.log", "a") as f:
+			f.write(f"key:{key}, val:{val} -- SIGNED BY: {NODEID}\n\n")
+			HASH_TABLE[key]=val
+		print("hash table:", HASH_TABLE)
 
 
 def is_outermost_val(num, list_):

@@ -9,7 +9,7 @@ channel = connection.channel()
 
 channel.exchange_declare(exchange='logs', exchange_type='fanout')
 
-message='1,'+' '.join(sys.argv[1:]) or "info: Hello World"
+message=' '.join(sys.argv[1:])
 channel.basic_publish(exchange='logs', routing_key='', body=message)
 
 print("[x] Sent %r" % message)

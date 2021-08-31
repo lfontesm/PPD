@@ -5,7 +5,7 @@ from multiprocessing import Process
 import random
 import time
 
-MAX_NUM=2**32
+MAX_NUM=2**6
 
 def boot():
 	########## GENERATES NODEID AND SENDS IT TO BROKER ##########
@@ -62,25 +62,17 @@ def calculate_neighbors():
 	# Remove it's own nodeid from list
 	int_nodeidlist.remove(nodeid)
 
-	# print(f"{nodeid} -> {int_nodeidlist}")
-	# Subtract nodeid from the nodeid list to get the decimal distance from the current node
-	# Ex: The decimal distance between 1 and 9 is 8, bcz 9-1=8
-	distancelist=list( map(lambda x: x-nodeid, int_nodeidlist) )
+	print(f"{nodeid} -> {int_nodeidlist}")
 
-	sorted_distancelist=sorted(distancelist, key=abs)
+	lowerbound_index, upperbound_index = boundaries(int_nodeidlist, nodeid)
 
-	upperbound=get_first_val(sorted_distancelist)
-	lowerbound=get_first_val(sorted_distancelist, positive=False)
+	print(f"Index of lowerbound for {nodeid}:", lowerbound_index)
+	print(f"Index of upperbound for {nodeid}:", upperbound_index)
 
-	print(upperbound, lowerbound)
+	predecessor=int_nodeidlist[lowerbound_index]
+	successor=int_nodeidlist[upperbound_index]
 
-	#print(f"Index of upperbound in {nodeid}:", distancelist.index(upperbound))
-	#print(f"Index of lowerbound in {nodeid}:", distancelist.index(lowerbound))
-
-	#successor=int_nodeidlist[distancelist.index(upperbound)]
-	#predecessor=int_nodeidlist[distancelist.index(lowerbound)]
-
-	#print(f"My successor is {successor} and my predecessor is {predecessor}")
+	print(f"My predecessor is {predecessor} and my successor is {successor}")
 
 
 def get_first_val(list_, positive=True):
@@ -89,6 +81,42 @@ def get_first_val(list_, positive=True):
 				return i
 			elif not positive and i<0:
 				return i
+
+# lhel se conseguir fazer essas duas funçoes abaixo serem mais bonitas ia ser lesgal
+def isAllNegative(list_):
+	for item in list_:
+		if item > 0:
+			return False
+	return True
+
+def isAllPositive(list_):
+	for item in list_:
+		if item < 0:
+			return False
+	return True
+
+# Returns the predecessor's and successor's index for the current node neighbors list 
+def boundaries(list_, nodeid):
+	# Subtract nodeid from the nodeid list to get the decimal distance from the current node
+	# Ex: The decimal distance between 1 and 9 is 8, bcz 9-1=8
+	distance_list=list( map(lambda x: x-nodeid, list_) )
+
+	sorted_distance_list=sorted(distance_list, key=abs)
+
+	# means that the current node is the biggest one
+	if isAllNegative(sorted_distance_list):
+		lowerbound=sorted_distance_list[0] 
+		upperbound=sorted_distance_list[-1]
+	# means the current node is the first one
+	elif isAllPositive(sorted_distance_list):
+		lowerbound=sorted_distance_list[-1]	
+		upperbound=sorted_distance_list[0]
+	# the current node is in the middle
+	else:
+		lowerbound=get_first_val(sorted_distance_list, positive=False)
+		upperbound=get_first_val(sorted_distance_list)
+
+	return distance_list.index(lowerbound), distance_list.index(upperbound)
 
 
 def callback(ch, method, properties, body):

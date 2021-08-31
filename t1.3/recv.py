@@ -6,6 +6,7 @@ import random
 import time
 
 MAX_NUM=2**10
+PROCESS_NUM=4
 
 def boot():
 	########## GENERATES NODEID AND SENDS IT TO BROKER ##########
@@ -121,7 +122,7 @@ def callback(ch, method, properties, body):
 random.seed()
 
 jobs=[]
-for i in range(4):
+for i in range(PROCESS_NUM):
 	p=Process(target=calculate_neighbors)
 	jobs.append(p)
 for job in jobs:

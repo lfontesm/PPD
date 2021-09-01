@@ -4,7 +4,7 @@
 function log_in_container(){
 	sleep 10
 
-	tail -f messages.log &
+	# tail -f messages.log &
 	docker exec -it ppd sh
 
 	echo Finishing up containers...

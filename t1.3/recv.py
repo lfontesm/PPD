@@ -12,6 +12,8 @@ NODEID=-1
 NODEID_LIST=[]
 PREDECESSOR=-1
 SUCCESSOR=-1
+# global LOG_FILE
+# LOG_FILE=open("messages.log", "a")
 
 def join():
 	########## GENERATES NODEID AND SENDS IT TO BROKER ##########
@@ -121,10 +123,10 @@ def log(key, val):
 	# Get
 	if val == None:
 		with open("messages.log", "a") as f:
-			f.write(f"Hash table at {key}: {HASH_TABLE[key]} -- SIGNED BY: {NODEID}\n")
+			f.write(f"Hash table at {key}: {HASH_TABLE.get(key)} -- SIGNED BY: {NODEID}\n")
 	else: # Put
 		with open("messages.log", "a") as f:
-			f.write(f"key:{key}, val:{val} -- SIGNED BY: {NODEID}\n\n")
+			f.write(f"key:{key}, val:{val} -- SIGNED BY: {NODEID}\n")
 			HASH_TABLE[key]=val
 			f.write(f"hash table: {HASH_TABLE}\n")
 
@@ -159,6 +161,7 @@ def boundaries(list_, nodeid):
 	return distance_list.index(lowerbound), distance_list.index(upperbound)
 
 random.seed()
+
 
 jobs=[]
 for i in range(PROCESS_NUM):

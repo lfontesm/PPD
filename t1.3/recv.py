@@ -63,7 +63,8 @@ def boot():
 
 	# Check if there are duplicates
 	if contains_duplicates(int_nodeidlist):
-		print("ABORTING: Duplicate nodes detected")
+		with open("messages.log", "a") as f:
+			f.write("ABORTING: Duplicate nodes detected")
 
 	# Remove it's own nodeid from list
 	int_nodeidlist.remove(nodeid)
@@ -93,7 +94,8 @@ def start_storing(connectioninfo):
 
 	channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 	
-	print(f"Node {NODEID} is ready.")
+	with open("messages.log", "a") as f:
+		f.write(f"Node {NODEID} is ready.\n")
 	channel.start_consuming()
 
 	# closes the connection
@@ -118,12 +120,13 @@ def callback(ch, method, properties, body):
 def log(key, val):
 	# Get
 	if val == None:
-		print(f"hashu taburu at {key}: {HASH_TABLE[key]} -- SIGNED BY: {NODEID}")
+		with open("messages.log", "a") as f:
+			f.write(f"Hash table at {key}: {HASH_TABLE[key]} -- SIGNED BY: {NODEID}\n")
 	else: # Put
 		with open("messages.log", "a") as f:
 			f.write(f"key:{key}, val:{val} -- SIGNED BY: {NODEID}\n\n")
 			HASH_TABLE[key]=val
-		print("hash table:", HASH_TABLE)
+			f.write(f"hash table: {HASH_TABLE}\n")
 
 
 def is_outermost_val(num, list_):

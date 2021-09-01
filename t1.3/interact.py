@@ -2,6 +2,7 @@
 
 import pika
 import random
+import time
 
 MAX_NUM=2**10
 
@@ -27,5 +28,8 @@ for i in range(MAX_NUM//2):
 
     channel.basic_publish(exchange='logs', routing_key='', body=message)
 
+time.sleep(1)
+
+channel.basic_publish(exchange='logs', routing_key='', body="print")
 
 connection.close()

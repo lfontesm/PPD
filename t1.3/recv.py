@@ -109,6 +109,10 @@ def callback(ch, method, properties, body):
 		key=int(body[0])
 		val=body[1]
 	else: 
+		if body[0] == 'print':
+			with open("messages.log", "a") as f:
+				f.write(f"{NODEID} hash table: {HASH_TABLE}\n")
+			return
 		key=int(body[0])
 		val=None
 
@@ -123,12 +127,11 @@ def log(key, val):
 	# Get
 	if val == None:
 		with open("messages.log", "a") as f:
-			f.write(f"Hash table at {key}: {HASH_TABLE.get(key)} -- SIGNED BY: {NODEID}\n")
+			f.write(f"GET: Hash table at {key}: {HASH_TABLE.get(key)} -- SIGNED BY: {NODEID}\n")
 	else: # Put
 		with open("messages.log", "a") as f:
-			f.write(f"key:{key}, val:{val} -- SIGNED BY: {NODEID}\n")
+			f.write(f"PUT: key:{key}, val:{val} -- SIGNED BY: {NODEID}\n")
 			HASH_TABLE[key]=val
-			f.write(f"hash table: {HASH_TABLE}\n")
 
 
 def is_outermost_val(num, list_):

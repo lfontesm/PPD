@@ -31,10 +31,12 @@ sudo systemctl start docker
 
 Depois disso, basta buildar a imagem e rodar o script **startup.sh** como sudo:
 ```bash
-sudo docker build -t ppd .
+sudo docker build -t ppd . *
 sudo sh startup.sh
 ```
 O script pode demorar um pouco para executar, mas quando terminar voce estará dentro do container contendo a versão de python e as bibliotecas utilizadas.
+
+\* O docker build será necessário apenas na primeira vez que você for executar o comando.
 
 ### Dentro do docker
 

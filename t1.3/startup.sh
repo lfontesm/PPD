@@ -4,7 +4,7 @@
 function log_in_container(){
 	sleep 10
 
-	tail -f messages.log &
+	# tail -f messages.log &
 	docker exec -it ppd sh
 
 	echo Finishing up containers...
@@ -17,7 +17,7 @@ function log_in_container(){
 # Boot up containters
 function start_up_containers() {
 	echo "Waiting for rabbitmq host. This can take a few seconds..."
-	docker-compose up --build >/dev/null & # Executes docker-compose in background
+	docker-compose up >/dev/null & # Executes docker-compose in background
 	if [[ $? -eq 0 ]]; then # Checks if cmd executed without errors
 		while true; do
 			nc -z localhost 5672

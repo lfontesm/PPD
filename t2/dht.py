@@ -96,7 +96,7 @@ def prepare_join(channel, queue_name):
 
 def killNode(tgt):
     if NODEID == tgt:
-        exit(1)
+        exit(0)
 
 # Calculate responsibility interval
 def accept_join(ch):

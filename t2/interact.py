@@ -1,33 +1,35 @@
 #!/usr/bin/env python3
 
+import random
 import pika
 import sys
 
-message = ' '.join(sys.argv[1:])
+# from dht import MAX_NUM
+MAX_NUM = 2**4
+
+message = ' '.join(sys.argv[1::])
+random.seed()
+
+connection = pika.BlockingConnection( pika.ConnectionParameters(host='localhost') )
+channel = connection.channel()
 
 if 'new' in message:
-    connection = pika.BlockingConnection( pika.ConnectionParameters(host='localhost') )
-
-    channel = connection.channel()
-
-    message=' '.join(sys.argv[1:])
     channel.queue_declare(queue='main_queue')
     channel.basic_publish(exchange='', routing_key='main_queue', body=message)
-    print("[x] Sent %r" % message)
     connection.close()
 
 else:
-    connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
-    channel = connection.channel()
-
     channel.exchange_declare(exchange='logs', exchange_type='fanout')
 
-    message = ' '.join(sys.argv[1:]) or "info: Hello World!"
+    if 'put' in message:
+        msgTmp = message.split(" ")
+        number = random.randint(0, MAX_NUM)
+        message = msgTmp[0] + " " + str(number) + " " + msgTmp[1]
+
     channel.basic_publish(exchange='logs', routing_key='', body=message)
-    print(" [x] Sent %r" % message)
     connection.close()
 
+print(" [x] Sent %r" % message)
 
 #     print('haha')
 #     channel.exchange_declare(exchange='logs', exchange_type='fanout')

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import pika
-from multiprocessing import Process
 import random
 import time
 import os
@@ -13,6 +12,7 @@ global NODEID_LIST
 NODEID_LIST = []
 PREDECESSOR = 1
 AM_CHILD = False
+HASH_TABLE = {}
 
 ####### Helper methods to handle the nodes list #######
 
@@ -49,8 +49,8 @@ def prepare_join(channel, queue_name):
 
     # publishes the message to all queues (routing_key='')
     channel.basic_publish(exchange='logs', routing_key='', body=message)
-    
-    time.sleep(1)
+
+    time.sleep(1.5)
 
     ########## DONE. BELOW IS THE ROUTINE WHERE WE RETRIEVE THE NODEIDS FROM THE MESSAGE QUEUE #########
 
@@ -90,7 +90,12 @@ def prepare_join(channel, queue_name):
         PREDECESSOR=NODEID
         SUCCESSOR=NODEID
 
-    print(f"I'm {NODEID} and nodelist is {NODEID_LIST}")
+    print(f"I'm {NODEID} with predecessor {PREDECESSOR} and successor {SUCCESSOR}")
+    print("\t",NODEID_LIST)
+
+    time.sleep(1)
+
+    recycle_keys()
 
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
@@ -105,7 +110,10 @@ def accept_join(ch):
 
     prepare_join(ch, queue_name)
 
-# def accept_leave():
+def store(key, val):
+    print(f"key:{key}, val:{val} -- SIGNED BY: {NODEID}\n")
+    HASH_TABLE[key]=val
+    print(f"hash table: {HASH_TABLE}\n")
 
 def callback(ch, method, properties, body):
     body=body.decode('utf-8')
@@ -114,13 +122,24 @@ def callback(ch, method, properties, body):
     elif 'join' in body:
         accept_join(ch)
     elif 'show' in body:
-        print(NODEID_LIST)
+        print(f"{NODEID}'s hash table: {HASH_TABLE}")
     elif 'remove' in body:
         targetNode = int( body.split(" ")[1] )
-        killNode(targetNode)
+        if NODEID == targetNode:
+            time.sleep(2)
+            recycle_keys()
+            exit(1)
         accept_join(ch)
+    elif 'put' in body:
+        bodyTmp = body.split(" ")
+        key = int( bodyTmp[1] )
+        val = bodyTmp[2]
 
-
+        # Special case in the node is the first from the list
+        if NODEID < min(NODEID_LIST) and (key >= PREDECESSOR and key < MAX_NUM or key >= 0 and key < NODEID):
+            store(key, val)
+        elif key >= PREDECESSOR and key < NODEID:
+            store(key, val)
 
 def rabbit_connect(nodeid):
     # message that will be sent to broker
@@ -156,6 +175,48 @@ def allocate_new_nodeid():
             NODEID_LIST.append(nodeid)
             return nodeid
 
+def recycle_keys():
+    print(f"{NODEID} got here")
+
+    if not HASH_TABLE:
+        return
+
+    print(f"{NODEID} got here 2____")
+
+    con = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost')
+    )
+    channel = con.channel()
+    
+    channel.exchange_declare(exchange='logs', exchange_type='fanout')
+
+    for k in HASH_TABLE.keys():
+        message = f"put {k} {HASH_TABLE[k]}"
+        print(f"{message}")
+        channel.basic_publish(exchange='logs', routing_key='', body=message)
+
+    con.close()
+
+def resend_keys(key):
+    con = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost')
+    )
+    channel = con.channel()
+
+    channel.exchange_declare(exchange='logs', exchange_type='fanout')
+    channel.basic_publish(exchange='logs', routing_key='', body=key)
+    con.close()
+
+def action(ch, method, properties, body):
+    body = body.decode('utf-8')
+    if 'recycle' in body:
+        message = body.split(" ")[1]
+        message = ' '.join(message[1::])
+        resend_keys(message)
+        return
+
+    request_join(ch,method, properties, body)
+
 def request_join(ch, method, properties, body):
     global AM_CHILD
     global NODEID
@@ -178,7 +239,7 @@ def main():
 
     channel.queue_declare(queue='main_queue')
 
-    channel.basic_consume(queue='main_queue', on_message_callback=request_join, auto_ack=True)
+    channel.basic_consume(queue='main_queue', on_message_callback=action, auto_ack=True)
 
     print(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()

@@ -90,10 +90,16 @@ def prepare_join(channel, queue_name):
         PREDECESSOR=NODEID
         SUCCESSOR=NODEID
 
+    print(f"I'm {NODEID} and nodelist is {NODEID_LIST}")
+
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
+def killNode(tgt):
+    if NODEID == tgt:
+        exit(1)
+
 # Calculate responsibility interval
-def accept_join(ch, method):
+def accept_join(ch):
     ch.stop_consuming()
     queue_name = QUEUE_NAME
 
@@ -106,9 +112,14 @@ def callback(ch, method, properties, body):
     if 'new' in body:
         request_join()
     elif 'join' in body:
-        accept_join(ch, method)
+        accept_join(ch)
     elif 'show' in body:
         print(NODEID_LIST)
+    elif 'remove' in body:
+        targetNode = int( body.split(" ")[1] )
+        killNode(targetNode)
+        accept_join(ch)
+
 
 
 def rabbit_connect(nodeid):
@@ -131,7 +142,7 @@ def rabbit_connect(nodeid):
     
     channel.queue_bind(exchange='logs', queue=queue_name)
     
-    time.sleep(1)
+    # time.sleep(1)
     
     prepare_join(channel, queue_name)
 
@@ -153,9 +164,9 @@ def request_join(ch, method, properties, body):
 
     if (os.fork() == 0):
         AM_CHILD = True
+        print(AM_CHILD)
         rabbit_connect(NODEID)
 
-        print(AM_CHILD)
     else:
         print(AM_CHILD)
 

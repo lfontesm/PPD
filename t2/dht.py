@@ -11,7 +11,6 @@ global QUEUE_NAME
 global NODEID_LIST
 NODEID_LIST = []
 PREDECESSOR = 1
-AM_CHILD = False
 HASH_TABLE = {}
 
 ####### Helper methods to handle the nodes list #######
@@ -50,8 +49,6 @@ def prepare_join(channel, queue_name):
     # publishes the message to all queues (routing_key='')
     channel.basic_publish(exchange='logs', routing_key='', body=message)
 
-    time.sleep(1.5)
-
     ########## DONE. BELOW IS THE ROUTINE WHERE WE RETRIEVE THE NODEIDS FROM THE MESSAGE QUEUE #########
 
     # Get all messages until the queue is empty
@@ -64,7 +61,10 @@ def prepare_join(channel, queue_name):
             break
 
     # Convert the elements in the list to int
-    int_nodeidlist=list( map(lambda x: int(x), nodeidlist) )
+    try:
+        int_nodeidlist=list( map(lambda x: int(x), nodeidlist) )
+    except:
+        print(f"error in node {NODEID}")
 
     # Remove it's own nodeid from list
     int_nodeidlist.remove(NODEID)
@@ -93,9 +93,9 @@ def prepare_join(channel, queue_name):
     print(f"I'm {NODEID} with predecessor {PREDECESSOR} and successor {SUCCESSOR}")
     print("\t",NODEID_LIST)
 
-    time.sleep(1)
+    time.sleep(.5)
 
-    recycle_keys()
+    recycle_keys(channel, queue_name)
 
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
@@ -127,7 +127,7 @@ def callback(ch, method, properties, body):
         targetNode = int( body.split(" ")[1] )
         if NODEID == targetNode:
             time.sleep(2)
-            recycle_keys()
+            recycle_keys(ch, QUEUE_NAME)
             exit(1)
         accept_join(ch)
     elif 'put' in body:
@@ -135,11 +135,15 @@ def callback(ch, method, properties, body):
         key = int( bodyTmp[1] )
         val = bodyTmp[2]
 
-        # Special case in the node is the first from the list
-        if NODEID < min(NODEID_LIST) and (key >= PREDECESSOR and key < MAX_NUM or key >= 0 and key < NODEID):
-            store(key, val)
-        elif key >= PREDECESSOR and key < NODEID:
-            store(key, val)
+        try:
+            # Special case in the node is the first from the list
+            if NODEID < min(NODEID_LIST) and (key >= PREDECESSOR and key <= MAX_NUM or key >= 0 and key < NODEID):
+                store(key, val)
+            elif key >= PREDECESSOR and key < NODEID:
+                store(key, val)
+        except:
+            print(f"Error in {NODEID}")
+
 
 def rabbit_connect(nodeid):
     # message that will be sent to broker
@@ -157,25 +161,28 @@ def rabbit_connect(nodeid):
     global QUEUE_NAME
     QUEUE_NAME = queue_name
 
+    time.sleep(0.5)
+
     channel.basic_publish(exchange='logs', routing_key='', body=message)
-    
+
     channel.queue_bind(exchange='logs', queue=queue_name)
-    
-    # time.sleep(1)
-    
+        
     prepare_join(channel, queue_name)
 
     channel.start_consuming()
+
 
 def allocate_new_nodeid():
     while True:
         nodeid = random.randint(0, MAX_NUM)
 
         if nodeid not in NODEID_LIST:
+            print(f"new node {nodeid}")
             NODEID_LIST.append(nodeid)
             return nodeid
 
-def recycle_keys():
+
+def recycle_keys(channel, queuename):
     print(f"{NODEID} got here")
 
     if not HASH_TABLE:
@@ -183,53 +190,19 @@ def recycle_keys():
 
     print(f"{NODEID} got here 2____")
 
-    con = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost')
-    )
-    channel = con.channel()
-    
-    channel.exchange_declare(exchange='logs', exchange_type='fanout')
-
-    for k in HASH_TABLE.keys():
-        message = f"put {k} {HASH_TABLE[k]}"
+    keys = list( HASH_TABLE.keys() )
+    for k in keys:
+        message = f"put {k} {HASH_TABLE.pop(k)}"
         print(f"{message}")
         channel.basic_publish(exchange='logs', routing_key='', body=message)
-
-    con.close()
-
-def resend_keys(key):
-    con = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost')
-    )
-    channel = con.channel()
-
-    channel.exchange_declare(exchange='logs', exchange_type='fanout')
-    channel.basic_publish(exchange='logs', routing_key='', body=key)
-    con.close()
-
-def action(ch, method, properties, body):
-    body = body.decode('utf-8')
-    if 'recycle' in body:
-        message = body.split(" ")[1]
-        message = ' '.join(message[1::])
-        resend_keys(message)
-        return
-
-    request_join(ch,method, properties, body)
+            
 
 def request_join(ch, method, properties, body):
-    global AM_CHILD
     global NODEID
 
     NODEID = allocate_new_nodeid()
-
     if (os.fork() == 0):
-        AM_CHILD = True
-        print(AM_CHILD)
         rabbit_connect(NODEID)
-
-    else:
-        print(AM_CHILD)
 
 
 # Main loop
@@ -239,7 +212,7 @@ def main():
 
     channel.queue_declare(queue='main_queue')
 
-    channel.basic_consume(queue='main_queue', on_message_callback=action, auto_ack=True)
+    channel.basic_consume(queue='main_queue', on_message_callback=request_join, auto_ack=True)
 
     print(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()

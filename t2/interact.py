@@ -2,6 +2,7 @@
 
 import random
 import pika
+import time
 import sys
 
 # from dht import MAX_NUM
@@ -30,20 +31,4 @@ else:
     connection.close()
 
 print(" [x] Sent %r" % message)
-
-#     print('haha')
-#     channel.exchange_declare(exchange='logs', exchange_type='fanout')
-#     channel.basic_publish(exchange='logs', routing_key='', body=message)
-
-
-# connection.close()
-
-# connection = pika.BlockingConnection(
-#     pika.ConnectionParameters(host='localhost'))
-# channel = connection.channel()
-
-# channel.queue_declare(queue='main_queue')
-
-# channel.basic_publish(exchange='', routing_key='main_queue', body='Hello World!')
-# print(" [x] Sent 'Hello World!'")
-# connection.close()
+time.sleep(1)

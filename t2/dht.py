@@ -64,7 +64,8 @@ def prepare_join(channel, queue_name):
     try:
         int_nodeidlist=list( map(lambda x: int(x), nodeidlist) )
     except:
-        print(f"error in node {NODEID}")
+        print(f"Error fetching the nodeid list in {NODEID}")
+        exit(1)
 
     # Remove it's own nodeid from list
     int_nodeidlist.remove(NODEID)
@@ -110,6 +111,11 @@ def accept_join(ch):
 
     prepare_join(ch, queue_name)
 
+def action_show():
+    show = f"I'm {NODEID}. My predecessor is {PREDECESSOR} and my successor is {SUCCESSOR}\n\t"
+    show += f"My hash table is {HASH_TABLE}"
+    print(show)
+
 def store(key, val):
     print(f"key:{key}, val:{val} -- SIGNED BY: {NODEID}\n")
     HASH_TABLE[key]=val
@@ -122,7 +128,7 @@ def callback(ch, method, properties, body):
     elif 'join' in body:
         accept_join(ch)
     elif 'show' in body:
-        print(f"{NODEID}'s hash table: {HASH_TABLE}")
+        action_show()
     elif 'remove' in body:
         targetNode = int( body.split(" ")[1] )
         if NODEID == targetNode:
@@ -135,6 +141,11 @@ def callback(ch, method, properties, body):
         key = int( bodyTmp[1] )
         val = bodyTmp[2]
 
+        # Checks if the node is the only one in the DHT
+        if not NODEID_LIST:
+            store(key, val)
+            return
+
         try:
             # Special case in the node is the first from the list
             if NODEID < min(NODEID_LIST) and (key >= PREDECESSOR and key <= MAX_NUM or key >= 0 and key < NODEID):
@@ -142,7 +153,7 @@ def callback(ch, method, properties, body):
             elif key >= PREDECESSOR and key < NODEID:
                 store(key, val)
         except:
-            print(f"Error in {NODEID}")
+            print(f"Error storing new key in {NODEID}")
 
 
 def rabbit_connect(nodeid):
@@ -177,18 +188,14 @@ def allocate_new_nodeid():
         nodeid = random.randint(0, MAX_NUM)
 
         if nodeid not in NODEID_LIST:
-            print(f"new node {nodeid}")
+            print(f"New node {nodeid} is joining")
             NODEID_LIST.append(nodeid)
             return nodeid
 
 
 def recycle_keys(channel, queuename):
-    print(f"{NODEID} got here")
-
     if not HASH_TABLE:
         return
-
-    print(f"{NODEID} got here 2____")
 
     keys = list( HASH_TABLE.keys() )
     for k in keys:

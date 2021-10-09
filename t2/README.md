@@ -10,13 +10,49 @@ Este arquivo apresenta a documentação referente ao trabalho final da disciplin
 
 _____________
 
+## Known Bugs
+Reconhecemos que o melhor jeito de implementar concorrência e comunicação entre pai e filho é pelo uso de sinais. Porém, devido à falta de tempo ocasionada por uma outra matéria, não conseguimos ter o tempo necessário para deixar o código do jeito que gostaríamos. Dito isso, as vezes algum nó pode não atribuir o predecessor e sucessor de forma correta durante a entrada de um nó na DHT. Esse bug é corrigido quando um nó sai ou quando um nó entra
+
 ## Dependências
 
 * Docker
-* docker-compose
+* pika
 
+## Como rodar
 
+Primeiro é necessário que o _daemon_ do docker esteja rodando, para ativá-lo, execute:
 
+Com _init_:
+
+```bash
+sudo /etc/init.d/docker start
+```
+
+Com _systemd_:
+
+```bash
+sudo systemctl start docker
+```
+
+Após isso basta subir o container oficial do RabbitMQ:
+
+```bash
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.9.5-management
+```
+
+Agora é necessário subir o servidor de DHT. Para tal, em outro terminal, rode o comando
+
+```bash
+python3 dht.py
+```
+
+Agora o servidor DHT está escutando por novos comandos.
+
+Para interagir com o servidor DHT, utilize o comando
+
+```bash
+python3 interact.py <cmd>
+```
 
 ## Comandos disponiveis
 
